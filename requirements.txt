@@ -1,2 +1,3 @@
 ipykernel
 numpy
+bs4

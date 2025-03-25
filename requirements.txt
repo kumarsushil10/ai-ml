@@ -12,3 +12,5 @@ langchain-community
 pypdf
 arxiv
 pymupdf
+langchain-ollama
+langchain-huggingface

@@ -16,3 +16,4 @@ langchain-ollama
 langchain-huggingface
 faiss-cpu
 langchain-chroma
+streamlit

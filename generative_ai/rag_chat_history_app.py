@@ -5,7 +5,6 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_ollama import OllamaLLM
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain.chains import create_history_aware_retriever
@@ -14,12 +13,14 @@ from langchain_core.prompts import MessagesPlaceholder
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_groq import ChatGroq
 
 
 load_dotenv()
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 os.environ["LANGSMITH_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
 os.environ["LANGSMITH_TRACING"] = os.getenv("LANGSMITH_TRACING")
+os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
 
 
@@ -27,6 +28,9 @@ st.title("Document Analyser")
 
 if 'store' not in st.session_state:
     st.session_state.store = {}
+
+if "messages" not in st.session_state:
+        st.session_state.messages = []
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in st.session_state.store:
@@ -80,7 +84,7 @@ if uploaded_files:
             ("human", "{input}"),
         ]
     )
-    llm = OllamaLLM(model="llama3.2")
+    llm = ChatGroq(model="llama-3.1-8b-instant",temperature=0.5)
     history_aware_retriever = create_history_aware_retriever(llm,retriever,contextualize_q_prompt)
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
     rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
@@ -93,11 +97,25 @@ if uploaded_files:
         output_messages_key="answer",
     )
 
-    question = st.text_input("Ask question related to provide document")
+    # Streamlit 
+    question = st.chat_input("Ask question related to provide document")
 
-    if question :
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # React to user input
+    if question:
+         # Human 
+        st.chat_message("user").markdown(question)
+        st.session_state.messages.append({"role": "user", "content": question})
+
+        # Ai
         answer = conversational_rag_chain.invoke({"input":question},config={"configurable":{"session_id":"default01"}})["answer"]
-        st.success(answer)
+        with st.chat_message("assistant"):
+            st.markdown(answer)
+        st.session_state.messages.append({"role": "assistant", "content": answer})    
 else:
     st.write("Please Upload file(.pdf) to analyse")
     st.session_state.store.clear()
+    st.session_state.messages.clear()

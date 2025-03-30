@@ -18,3 +18,5 @@ faiss-cpu
 langchain-chroma
 streamlit
 langchain-groq
+arxiv
+wikipedia

@@ -59,7 +59,7 @@ if uploaded_files:
     system_prompt = (
         """ 
         You are an AI assistant.
-        Your goal is to provide clear, accurate, and well-structured answers based on the given context.
+        Your goal is to provide question answers stictly based on the given context.
         Carefully analyze the context before answering, and explain in a simple and understandable way.
         If necessary, break complex concepts into smaller parts to enhance comprehension.
         <context> {context} </context>

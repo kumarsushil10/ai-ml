@@ -20,3 +20,4 @@ streamlit
 langchain-groq
 arxiv
 wikipedia
+langgraph

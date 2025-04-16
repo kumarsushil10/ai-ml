@@ -21,3 +21,4 @@ langchain-groq
 arxiv
 wikipedia
 langgraph
+pydantic

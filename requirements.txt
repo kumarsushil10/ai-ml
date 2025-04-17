@@ -22,3 +22,4 @@ arxiv
 wikipedia
 langgraph
 pydantic
+duckduckgo-search
